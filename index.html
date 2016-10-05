@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CollabDraw</title>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.js" type="text/javascript"></script>
+</head>
+<body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <div id="myApp">
+      <input @keydown.enter="setColor(color)" v-model="color" type="text" name="name" value="">
+      <button @click="setColor(color)" type="button" name="button"></button>
+      <br>
+      the current color is <p>{{color}}</p>
+    </div>
+  <script>
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext("2d");
+
+  var socket = io();
+
+  socket.on("changes", function(data){
+    draw(data);
+    lines.push(data);
+  });
+
+  var currentZoom = 1;
+
+  var mouse = {};
+  var lines =[];
+
+  var w = canvas.width;
+  var h = canvas.height;
+
+  var oldx = 0;
+  var oldy = 0;
+
+  var color = prompt();
+
+  ctx.fillStyle = "black";
+  ctx.fillRect(0,0,w,h);
+
+
+  canvas.addEventListener("mousedown", function(evt){
+    oldx = (evt.clientX-canvas.offsetTop)/currentZoom;
+    oldy = (evt.clientY-canvas.offsetLeft)/currentZoom;
+    mouse.down = true;
+  });
+  canvas.addEventListener("mouseup", function(){
+    mouse.down = false;
+  });
+
+  canvas.addEventListener("mousemove", function(evt){
+    if(mouse.down){
+      setupDraw((evt.clientX-canvas.offsetTop)/currentZoom, (evt.clientY-canvas.offsetLeft)/currentZoom, oldx, oldy, 5, color);
+    }
+  });
+
+  function setupDraw(x, y, oldx, oldy, width, color){
+    var args = {
+      x: x,
+      y: y,
+      width: width,
+      color: color,
+      oldx: oldx,
+      oldy: oldy
+    }
+    socket.emit("drawData", args);
+    draw(args);
+    lines.push(args);
+  }
+  function draw(args){
+    ctx.strokeStyle = args.color || "red";
+    ctx.lineWidth = args.width || 1;
+    ctx.beginPath();
+    ctx.moveTo(args.oldx, args.oldy);
+    ctx.lineTo(args.x, args.y);
+    ctx.stroke();
+    oldx=args.x;
+    oldy=args.y;
+  }
+
+  function zoom(x){
+    var dx = (x-currentZoom)*100;
+    currentZoom=x;
+    setTimeout(function(){ctx.scale(1/currentZoom, 1/currentZoom)}, 5 + dx*5);
+    for(var i = 0; i<dx; i++){
+      setTimeout(function(){scale(1.01, 1.01)}, i*5);
+    }
+
+
+  }
+
+  function scale(x, y){
+    ctx.fillRect(0, 0, w, h);
+    ctx.scale(x, y);
+    lines.forEach(function(line){
+      draw(line);
+    });
+  }
+
+  new Vue({
+    el: "#myApp",
+    data: {
+      count: 1,
+      color: color
+    },
+
+    methods: {
+      setColor: function(theColor){
+        color = theColor;
+      }
+    }
+  })
+  </script>
+</body>
+</html>
