@@ -72,10 +72,10 @@
   }
   function draw(args){
     ctx.strokeStyle = args.color || "red";
-    ctx.lineWidth = args.width || 1;
+    ctx.lineWidth = (args.width || 1)*currentZoom;
     ctx.beginPath();
-    ctx.moveTo(args.oldx, args.oldy);
-    ctx.lineTo(args.x, args.y);
+    ctx.moveTo(args.oldx*currentZoom, args.oldy*currentZoom);
+    ctx.lineTo(args.x*currentZoom, args.y*currentZoom);
     ctx.stroke();
     oldx=args.x;
     oldy=args.y;
@@ -83,10 +83,8 @@
 
   function zoom(x){
     var dx = (x-currentZoom)*100;
-    currentZoom=x;
-    setTimeout(function(){ctx.scale(1/currentZoom, 1/currentZoom)}, 5 + dx*5);
     for(var i = 0; i<dx; i++){
-      setTimeout(function(){scale(1.01, 1.01)}, i*5);
+      setTimeout(function(){scale(1.01, 1.01)}, i*10);
     }
 
 
@@ -94,7 +92,7 @@
 
   function scale(x, y){
     ctx.fillRect(0, 0, w, h);
-    ctx.scale(x, y);
+    currentZoom += 0.02
     lines.forEach(function(line){
       draw(line);
     });
