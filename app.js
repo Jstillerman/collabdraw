@@ -1,3 +1,15 @@
+var ftch= require("./node_modules/whatwg-fetch/fetch.js");
+
+fetch('/identity')
+.then(function(response) {
+	return response.json()
+}).then(function(json) {
+	console.log('got Identity', json);
+	ident = json;
+	zoom(ident.zoom.zoom);
+}).catch(function(ex) {
+	console.log('parsing failed', ex)
+})
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 
@@ -9,6 +21,8 @@ socket.on("changes", function(data){
 });
 
 var currentZoom = 1;
+
+var ident;
 
 var mouse = {};
 var lines =[];
