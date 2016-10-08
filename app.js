@@ -21,7 +21,8 @@ socket.on("changes", function(data){
 });
 
 var currentZoom = 1;
-
+var shiftx = 0;
+var shifty = 0;
 var ident;
 
 var mouse = {};
@@ -40,8 +41,8 @@ ctx.fillRect(0,0,w,h);
 
 
 canvas.addEventListener("mousedown", function(evt){
-	oldx = (evt.clientX-canvas.offsetTop)/currentZoom;
-	oldy = (evt.clientY-canvas.offsetLeft)/currentZoom;
+	oldx = (evt.clientX-canvas.offsetTop)/currentZoom - (w*(ident.zoom.index%2));
+	oldy = (evt.clientY-canvas.offsetLeft)/currentZoom - (h*Math.floor(ident.zoom.index/2));
 	mouse.down = true;
 });
 canvas.addEventListener("mouseup", function(){
@@ -50,7 +51,7 @@ canvas.addEventListener("mouseup", function(){
 
 canvas.addEventListener("mousemove", function(evt){
 	if(mouse.down){
-		setupDraw((evt.clientX-canvas.offsetTop)/currentZoom, (evt.clientY-canvas.offsetLeft)/currentZoom, oldx, oldy, 5, color);
+		setupDraw((evt.clientX-canvas.offsetTop)/currentZoom - (w*(ident.zoom.index%2)), (evt.clientY-canvas.offsetLeft)/currentZoom - (h*Math.floor(ident.zoom.index/2)), oldx, oldy, 5/currentZoom, color);
 	}
 });
 
@@ -71,14 +72,14 @@ function draw(args){
 	ctx.strokeStyle = args.color || "red";
 	ctx.lineWidth = (args.width || 1)*currentZoom;
 	ctx.beginPath();
-	ctx.moveTo(args.oldx*currentZoom, args.oldy*currentZoom);
-	ctx.lineTo(args.x*currentZoom, args.y*currentZoom);
+	ctx.moveTo(args.oldx*currentZoom-(w*(ident.zoom.index%2)), args.oldy*currentZoom-(h * Math.floor(ident.zoom.index/2)));
+	ctx.lineTo(args.x*currentZoom - (w*(ident.zoom.index%2)), args.y*currentZoom-(h * Math.floor(ident.zoom.index/2)));
 	ctx.stroke();
 	oldx=args.x;
 	oldy=args.y;
 }
 
-function zoom(x){
+function zoom(x, index){
 	var dx = (x-currentZoom)*100;
 	for(var i = 0; i<dx; i++){
 		setTimeout(function(){scale(1.01, 1.01)}, i*10);
@@ -89,7 +90,7 @@ function zoom(x){
 
 function scale(x, y){
 	ctx.fillRect(0, 0, w, h);
-	currentZoom += 0.02
+	currentZoom += 0.01
 		lines.forEach(function(line){
 			draw(line);
 		});

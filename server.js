@@ -2,7 +2,7 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var express = require("express");
-server.listen(80);
+server.listen(8000);
 
 
 app.get('/', function (req, res) {
@@ -23,8 +23,9 @@ app.get('/clear', function(req, res){
 
 lines = [];
 zoom = {
-	zoom: 0.5, //This will become 1 upon first visit
-	index: 0
+	zoom: 1, //This will become 1 upon first visit
+	index: -1,
+	maxIndex: 1
 };
 
 io.on('connection', function (socket) {
@@ -48,7 +49,12 @@ function getNewIdentity(){
 }
 
 function getNextZoom(){
-	zoom.zoom*=2;
+	zoom.index ++;
+	if(zoom.index == zoom.maxIndex){
+		zoom.zoom*=2;
+		zoom.maxIndex = zoom.zoom * zoom.zoom;
+		zoom.index = 0;
+	}
 	console.log("Assigned zoom", zoom);
 	return zoom;
 }
