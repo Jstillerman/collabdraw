@@ -96,6 +96,7 @@ function zoom(z, index){
 }
 
 function scale(x, y){
+	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, w, h);
 	currentZoom += 0.01
 		lines.forEach(function(line){
@@ -104,6 +105,7 @@ function scale(x, y){
 }
 
 function pan(x, y){
+	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, w, h);
 	shiftx += x;
 	shifty += y;
