@@ -1,4 +1,4 @@
-var ftch= require("./node_modules/whatwg-fetch/fetch.js");
+var ftch = require("./node_modules/whatwg-fetch/fetch.js");
 
 fetch('/identity')
 .then(function(response) {
@@ -6,7 +6,7 @@ fetch('/identity')
 }).then(function(json) {
 	console.log('got Identity', json);
 	ident = json;
-	zoom(ident.zoom.zoom);
+	zoom(ident.zoom.zoom, ident.zoom.index);
 }).catch(function(ex) {
 	console.log('parsing failed', ex)
 })
@@ -39,10 +39,13 @@ var color = prompt();
 ctx.fillStyle = "black";
 ctx.fillRect(0,0,w,h);
 
+function getSize(){
+	return vm.$data.size; //This fetches the size from Vue
+}
 
 canvas.addEventListener("mousedown", function(evt){
-	oldx = (evt.clientX-canvas.offsetTop)/currentZoom - (w*(ident.zoom.index%2));
-	oldy = (evt.clientY-canvas.offsetLeft)/currentZoom - (h*Math.floor(ident.zoom.index/2));
+	oldx = (evt.clientX-canvas.offsetTop + shiftx)/currentZoom;
+	oldy = (evt.clientY-canvas.offsetLeft + shifty)/currentZoom;
 	mouse.down = true;
 });
 canvas.addEventListener("mouseup", function(){
@@ -51,7 +54,7 @@ canvas.addEventListener("mouseup", function(){
 
 canvas.addEventListener("mousemove", function(evt){
 	if(mouse.down){
-		setupDraw((evt.clientX-canvas.offsetTop)/currentZoom - (w*(ident.zoom.index%2)), (evt.clientY-canvas.offsetLeft)/currentZoom - (h*Math.floor(ident.zoom.index/2)), oldx, oldy, 5/currentZoom, color);
+		setupDraw((evt.clientX-canvas.offsetTop + shiftx)/currentZoom, (evt.clientY-canvas.offsetLeft + shifty)/currentZoom, oldx, oldy, getSize()/currentZoom, color);
 	}
 });
 
@@ -72,17 +75,24 @@ function draw(args){
 	ctx.strokeStyle = args.color || "red";
 	ctx.lineWidth = (args.width || 1)*currentZoom;
 	ctx.beginPath();
-	ctx.moveTo(args.oldx*currentZoom-(w*(ident.zoom.index%2)), args.oldy*currentZoom-(h * Math.floor(ident.zoom.index/2)));
-	ctx.lineTo(args.x*currentZoom - (w*(ident.zoom.index%2)), args.y*currentZoom-(h * Math.floor(ident.zoom.index/2)));
+	ctx.moveTo(args.oldx*currentZoom-shiftx, args.oldy*currentZoom-shifty);
+	ctx.lineTo(args.x*currentZoom-shiftx, args.y*currentZoom-shifty);
 	ctx.stroke();
 	oldx=args.x;
 	oldy=args.y;
 }
 
-function zoom(x, index){
-	var dx = (x-currentZoom)*100;
-	for(var i = 0; i<dx; i++){
+function zoom(z, index){
+	var dz = (z-currentZoom)*100;
+	for(var i = 0; i<dz; i++){
 		setTimeout(function(){scale(1.01, 1.01)}, i*10);
+	}
+	for(var i = 0; i < w * (ident.zoom.index%2); i++){
+		setTimeout(function(){pan(1, 0);}, i*10);
+	}
+
+	for(var i = 0; i < h* Math.floor(ident.zoom.index/2); i++){
+		setTimeout(function(){pan(0, 1);}, i*10);
 	}
 
 
@@ -96,16 +106,29 @@ function scale(x, y){
 		});
 }
 
-new Vue({
+function pan(x, y){
+	ctx.fillRect(0, 0, w, h);
+	shiftx += x;
+	shifty += y;
+	lines.forEach(function(line){
+		draw(line);
+	});
+}
+
+var vm = new Vue({
 	el: "#myApp",
     data: {
 	    count: 1,
-    color: color
+    	color: color,
+			size: 5
     },
 
     methods: {
 	    setColor: function(theColor){
 		    color = theColor;
-	    }
+	    },
+			getInfo: function(){
+				console.log(shiftx, shifty);
+			}
     }
-})
+});

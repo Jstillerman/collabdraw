@@ -2,7 +2,7 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var express = require("express");
-server.listen(8000);
+server.listen(8001);
 
 
 app.get('/', function (req, res) {
@@ -16,14 +16,15 @@ app.get('/identity', function(req, res){
 });
 
 app.get('/clear', function(req, res){
-	lines = [];
-	io.emit('delete');
+	lines = []; //clear canvas
+	zoom = {zoom: 1,index: -1,maxIndex: 1} //Reset zooming
+	io.emit('delete'); //Tell clients to clear
 	res.redirect("/");
 });
 
 lines = [];
 zoom = {
-	zoom: 1, //This will become 1 upon first visit
+	zoom: 1,
 	index: -1,
 	maxIndex: 1
 };

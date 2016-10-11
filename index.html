@@ -9,10 +9,12 @@
 <body>
     <canvas id="canvas" width="300" height="300"></canvas>
     <div id="myApp">
+      <input type="range" min="2" max="15" v-model="size">
       <input @keydown.enter="setColor(color)" v-model="color" type="text" name="name" value="">
       <button @click="setColor(color)" type="button" name="button"></button>
       <br>
-      the current color is <p>{{color}}</p>
+      <p> Size: {{size}}</p><br>
+      <p> Color: {{color}}</p>
     </div>
   <script src="bundle.js"></script>
 </body>
