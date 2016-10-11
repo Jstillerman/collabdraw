@@ -73,14 +73,16 @@ function setupDraw(x, y, oldx, oldy, width, color){
 }
 function draw(args){
 	ctx.strokeStyle = args.color || "red";
+	ctx.fillStyle= args.color || "red";
 	ctx.lineWidth = (args.width || 1)*currentZoom;
 	ctx.beginPath();
-	ctx.moveTo(args.oldx*currentZoom-shiftx, args.oldy*currentZoom-shifty);
-	ctx.lineTo(args.x*currentZoom-shiftx, args.y*currentZoom-shifty);
+	ctx.arc(args.x, args.y, args.width, 0, 2*Math.PI, false);
+	//ctx.moveTo(args.oldx*currentZoom-shiftx, args.oldy*currentZoom-shifty);
+	//ctx.lineTo(args.x*currentZoom-shiftx, args.y*currentZoom-shifty);
 	ctx.stroke();
 	oldx=args.x;
 	oldy=args.y;
-}
+} 
 
 function zoom(z, index){
 	var dz = (z-currentZoom)*100;
