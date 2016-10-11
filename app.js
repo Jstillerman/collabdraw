@@ -43,12 +43,12 @@ function getSize(){
 	return vm.$data.size; //This fetches the size from Vue
 }
 
-canvas.addEventListener("mousedown", function(evt){
+window.addEventListener("mousedown", function(evt){
 	oldx = (evt.clientX-canvas.offsetTop + shiftx)/currentZoom;
 	oldy = (evt.clientY-canvas.offsetLeft + shifty)/currentZoom;
 	mouse.down = true;
 });
-canvas.addEventListener("mouseup", function(){
+window.addEventListener("mouseup", function(){
 	mouse.down = false;
 });
 
