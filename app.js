@@ -34,7 +34,7 @@ var h = canvas.height;
 var oldx = 0;
 var oldy = 0;
 
-var color = prompt();
+var color = "white";
 
 ctx.fillStyle = "black";
 ctx.fillRect(0,0,w,h);
@@ -72,17 +72,12 @@ function setupDraw(x, y, oldx, oldy, width, color){
 	lines.push(args);
 }
 function draw(args){
-	ctx.strokeStyle = args.color || "red";
 	ctx.fillStyle= args.color || "red";
 	ctx.lineWidth = (args.width || 1)*currentZoom;
 	ctx.beginPath();
-	ctx.arc(args.x, args.y, args.width, 0, 2*Math.PI, false);
-	//ctx.moveTo(args.oldx*currentZoom-shiftx, args.oldy*currentZoom-shifty);
-	//ctx.lineTo(args.x*currentZoom-shiftx, args.y*currentZoom-shifty);
-	ctx.stroke();
-	oldx=args.x;
-	oldy=args.y;
-} 
+	ctx.arc(args.x*currentZoom-shiftx, args.y*currentZoom-shifty, args.width*currentZoom, 0, 2*Math.PI, false);
+	ctx.fill();
+}
 
 function zoom(z, index){
 	var dz = (z-currentZoom)*100;
