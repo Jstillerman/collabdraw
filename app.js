@@ -20,6 +20,11 @@ socket.on("changes", function(data){
 	lines.push(data);
 });
 
+socket.on("delete", function(){
+	lines = [];
+	pan(0,0); //Refresh the screen
+});
+
 var currentZoom = 1;
 var shiftx = 0;
 var shifty = 0;
@@ -82,7 +87,7 @@ function draw(args){
 function zoom(z, index){
 	var dz = (z-currentZoom)*100;
 	for(var i = 0; i<dz; i++){
-		setTimeout(function(){scale(1.01, 1.01)}, i*10);
+		setTimeout(function(){scale(0.01)}, i*10);
 	}
 	for(var i = 0; i < w * (ident.zoom.index%2); i++){
 		setTimeout(function(){pan(1, 0);}, i*10);
@@ -95,10 +100,10 @@ function zoom(z, index){
 
 }
 
-function scale(x, y){
+function scale(x){
 	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, w, h);
-	currentZoom += 0.01
+	currentZoom += x;
 		lines.forEach(function(line){
 			draw(line);
 		});
@@ -121,13 +126,17 @@ var vm = new Vue({
     	color: color,
 			size: 5
     },
-
     methods: {
+			zoom: function(){
+				return currentZoom;
+			},
 	    setColor: function(theColor){
 		    color = theColor;
 	    },
 			getInfo: function(){
 				console.log(shiftx, shifty);
-			}
+			},
+			scale: scale,
+			pan: pan
     }
 });

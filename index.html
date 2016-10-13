@@ -12,9 +12,17 @@
       <input type="range" min="2" max="15" v-model="size">
       <input @keydown.enter="setColor(color)" v-model="color" type="text" name="name" value="">
       <button @click="setColor(color)" type="button" name="button"></button>
+      <button @click="scale(-0.1)" type="button">zoom out</button>
+      <button @click="scale(0.1)" type="button">zoom in</button>
+      <button @click="pan(0, -5)" type="button">up</button>
+      <button @click="pan(0, 5)" type="button">down</button>
+      <button @click="pan(5, 0)" type="button">left</button>
+      <button @click="pan(-5, 0)" type="button">right</button>
+
       <br>
       <p> Size: {{size}}</p><br>
-      <p> Color: {{color}}</p>
+      <p> Color: {{color}}</p><br>
+      <p> Zoom: {{ zoom() }}x</p>
     </div>
   <script src="bundle.js"></script>
 </body>
